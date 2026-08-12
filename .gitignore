@@ -9,11 +9,11 @@ out/
 target/
 
 # NetBeans
-nbproject/private/
-nbproject/build-impl.xml
-nbproject/genfiles.properties
-nbproject/rebuild-impl.xml
-nbproject/nbproject/*.log
+**/nbproject/private/
+**/nbproject/build-impl.xml
+**/nbproject/genfiles.properties
+**/nbproject/rebuild-impl.xml
+**/nbproject/*.log
 build.xml.log
 
 # Eclipse
