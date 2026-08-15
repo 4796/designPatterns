@@ -1,6 +1,5 @@
 package AbstractProductC;
 
-import Colleaque.RaskrsnicaKolega;
 import DomainClasses.Auto;
 import DomainClasses.Autobus;
 import DomainClasses.Boja;
@@ -26,43 +25,39 @@ public abstract class IzvorPodataka
 
     SaobracajnaMreza saobracajnaMreza;
     private Mediator mediator;
-    private List<RaskrsnicaKolega> kolege;
 
 
     public abstract boolean fokusMreza();
 
-    public String prinudnoPostaviSemafor(int indeks, Boja zeljenaBoja) {
-        if (indeks < 0 || indeks >= kolege.size()) {
-            return "Nepostojeca raskrsnica.";
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append("Pre:\n");
-        for (RaskrsnicaKolega k : kolege) {
-            sb.append("  ").append(k.getRaskrsnica().getOznaka()).append(": ")
-              .append(k.getRaskrsnica().getSemafor().getBoja().prikaz()).append("\n");
-        }
-        kolege.get(indeks).zatraziPromenu(zeljenaBoja);
-        sb.append("Posle:\n");
-        for (RaskrsnicaKolega k : kolege) {
-            sb.append("  ").append(k.getRaskrsnica().getOznaka()).append(": ")
-              .append(k.getRaskrsnica().getSemafor().getBoja().prikaz()).append("\n");
-        }
-        return sb.toString();
+    public int getBrojRaskrsnica() {
+        return mediator.brojKolega();
     }
 
-    public int getBrojRaskrsnica() {
-        return kolege.size();
+    public String prinudnoPostaviSemafor(int indeks, Boja zeljenaBoja) {
+        return mediator.prinudnoPostaviSemafor(indeks, zeljenaBoja);
+    }
+
+    public String zapocniPracenjeVozila(int indeksUlice, int indeksVozila) {
+        List<Put> putevi = getPutevi();
+        if (indeksUlice < 0 || indeksUlice >= putevi.size()) {
+            return "Nepostojeca ulica.";
+        }
+        Put put = putevi.get(indeksUlice);
+        List<Vozilo> vozila = put.getVozila();
+        if (indeksVozila < 0 || indeksVozila >= vozila.size()) {
+            return "Nepostojece vozilo.";
+        }
+        Vozilo v = vozila.get(indeksVozila);
+        mediator.pratiVozilo(v);
+        return "Pratimo vozilo " + v.getId() + " (brzina " + v.getBrzina() + ") na ulici " + put.getNaziv() + ".";
+    }
+
+    public void pripremiSemaforeAkoPratimoVozilo() {
+        mediator.pripremiSemaforeAkoPratimoVozilo();
     }
 
     private void povezaniSemafori(List<Raskrsnica> raskrsnice) {
-        kolege = new ArrayList<>();
-        for (Raskrsnica r : raskrsnice) {
-            kolege.add(new RaskrsnicaKolega(r));
-        }
-        mediator = new SemaforskiMedijator(kolege.get(0), kolege.get(1), kolege.get(2), kolege.get(3));
-        for (RaskrsnicaKolega k : kolege) {
-            k.setMediator(mediator);
-        }
+        mediator = new SemaforskiMedijator(raskrsnice);
     }
 
 

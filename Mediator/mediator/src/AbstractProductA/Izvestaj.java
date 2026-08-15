@@ -4,6 +4,9 @@ import AbstractProductB.Detaljnost;
 import AbstractProductC.IzvorPodataka;
 import AbstractProductD.Kontroler;
 import DomainClasses.Boja;
+import DomainClasses.Put;
+import DomainClasses.Vozilo;
+import java.util.List;
 import java.util.Scanner;
 
 
@@ -43,18 +46,30 @@ public abstract class Izvestaj {
     }
     
     public void prikaziEkranskuFormu(Scanner unos, IzvorPodataka ip, Kontroler kon) {
+        System.out.println();
+        System.out.println("Nacin upravljanja semaforima:");
+        System.out.println("1) Rucno (birate raskrsnicu i boju kad god zelite)");
+        System.out.println("2) Automatsko pracenje vozila (birate vozilo jednom, koridor se sam racuna svaki krug)");
+        System.out.print("Izbor: ");
+        boolean rucniRezim = !unos.nextLine().trim().equals("2");
+
         boolean kraj = false;
         while (!kraj) {
             System.out.println();
             System.out.println("--- Meni simulacije ---");
             System.out.println("1) Simuliraj sledeci krug");
             System.out.println("2) Prikazi izvestaj");
-            System.out.println("3) Prinudno postavi semafor");
+            if (rucniRezim) {
+                System.out.println("3) Prinudno postavi semafor");
+            } else {
+                System.out.println("3) Prati vozilo");
+            }
             System.out.println("0) Zavrsi ovu simulaciju");
             System.out.print("Izbor: ");
             String izbor = unos.nextLine().trim();
             switch (izbor) {
                 case "1":
+                    ip.pripremiSemaforeAkoPratimoVozilo();
                     System.out.println();
                     System.out.println(kon.simulirajJedanKrug());
                     break;
@@ -63,7 +78,11 @@ public abstract class Izvestaj {
                     System.out.println(tekstIzvestaja(ip));
                     break;
                 case "3":
-                    prinudnoPostaviSemafor(unos, ip);
+                    if (rucniRezim) {
+                        prinudnoPostaviSemafor(unos, ip);
+                    } else {
+                        zapocniPracenjeVozila(unos, ip);
+                    }
                     break;
                 case "0":
                     kraj = true;
@@ -87,6 +106,36 @@ public abstract class Izvestaj {
 
         System.out.println();
         System.out.println(ip.prinudnoPostaviSemafor(indeks, zeljenaBoja));
+    }
+
+    private void zapocniPracenjeVozila(Scanner unos, IzvorPodataka ip) {
+        List<Put> putevi = ip.getPutevi();
+        System.out.println();
+        System.out.println("Izaberite ulicu:");
+        for (int idx = 0; idx < putevi.size(); idx++) {
+            System.out.println("  " + (idx + 1) + ") " + putevi.get(idx).getNaziv());
+        }
+        System.out.print("Izbor: ");
+        int indeksUlice = citajBroj(unos) - 1;
+        if (indeksUlice < 0 || indeksUlice >= putevi.size()) {
+            System.out.println("Nepostojeca ulica.");
+            return;
+        }
+
+        List<Vozilo> vozila = putevi.get(indeksUlice).getVozila();
+        if (vozila.isEmpty()) {
+            System.out.println("Nema vozila na toj ulici.");
+            return;
+        }
+        System.out.println("Izaberite vozilo:");
+        for (int idx = 0; idx < vozila.size(); idx++) {
+            System.out.println("  " + (idx + 1) + ") " + vozila.get(idx).getId() + " (brzina " + vozila.get(idx).getBrzina() + ")");
+        }
+        System.out.print("Izbor: ");
+        int indeksVozila = citajBroj(unos) - 1;
+
+        System.out.println();
+        System.out.println(ip.zapocniPracenjeVozila(indeksUlice, indeksVozila));
     }
 
     private int citajBroj(Scanner unos) {
