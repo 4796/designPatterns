@@ -1,0 +1,12 @@
+package AbstractFactory;
+
+import AbstractProductC.IzvorPodataka;
+import AbstractProductD.Kontroler;
+import AbstractProductA.*;
+
+public interface Projektant { // Creator
+       Izvestaj kreirajIzvestaj();
+       IzvorPodataka kreirajIzvorPodataka ();
+       Kontroler kreirajKontroler (Izvestaj i,IzvorPodataka ip);
+
+}
